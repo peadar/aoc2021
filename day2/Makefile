@@ -8,5 +8,6 @@ parser.cc parser.h: parser.y
 	bison -o parser.cc --defines=parser.h $^
 clean:
 	rm -rf *.cc *.o sol *.h
-test: sol
+test: sol sm
 	./sol < .input
+	./sm < .input

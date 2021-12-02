@@ -1,28 +1,27 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-enum state {
+enum {
    expect_space,
    expect_num,
-};
+   done
+} s;
 
-state s = expect_space;
-int num = 0;
-int *target = 0;
-int sign = 0;
+int num;
+int *target;
 int aim;
 int mul;
 int horiz;
 int depth;
+int c;
 
 int
 main()
 {
-   int c;
-   int num = 0;
-   while ((c = getc(stdin)) != EOF) {
+   while (s != done) {
       switch (s) {
          case expect_space:
-            switch (c) {
+            switch (c = getc(stdin)) {
                case ' ':
                   s = expect_num;
                   break;
@@ -38,11 +37,15 @@ main()
                   target = &horiz;
                   mul = 1;
                   break;
+               case -1:
+                  s = done;
+                  break;
+
             }
             break;
 
          case expect_num:
-            switch (c) {
+            switch (c = getc(stdin)) {
                case '0': case '1': case '2': case '3': case '4':
                case '5': case '6': case '7': case '8': case '9':
                   num = num * 10 + c - '0';
@@ -55,7 +58,11 @@ main()
                   target = nullptr;
                   s = expect_space;
                   break;
+               default:
+                  abort();
             }
+            break;
+         case done:
             break;
       }
    }
