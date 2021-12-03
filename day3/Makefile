@@ -1,6 +1,6 @@
 YACC=bison
 
-CXXFLAGS = -g -O0
+CXXFLAGS = -g -O0 --std=c++20
 all: test
 
 %.cc: %.y++

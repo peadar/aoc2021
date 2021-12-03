@@ -1,5 +1,4 @@
 #include <vector>
-#include <assert.h>
 #include <algorithm>
 #include <string>
 #include <iostream>
@@ -7,14 +6,13 @@ int main() {
    using Value = unsigned long;
    std::vector<Value> values;
    size_t maxbits = 0;
-   for (;;) {
-      std::string s;
-      std::cin >> s;
-      if (s == "")
-         break;
-      maxbits = std::max(s.size(), maxbits);
-      values.push_back(strtoul(s.c_str(), 0, 2));
-   }
+   std::transform(std::istream_iterator<std::string>(std::cin),
+                  std::istream_iterator<std::string>(),
+                  std::back_inserter(values),
+                  [&maxbits](const std::string &s) {
+                     maxbits = std::max(maxbits, s.size());
+                     return std::stol(s, 0, 2);
+                  });
    std::sort(values.begin(), values.end());
    Value out = 1;
    for (int pass = 0; pass < 2; ++pass) {
