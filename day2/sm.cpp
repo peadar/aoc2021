@@ -10,13 +10,10 @@ int l;
 int
 main()
 {
-   for(;;) {
-      switch (targets[1]) {
+   while((c=getc(stdin)) != -1) {
+      switch (targets[1] % 2) {
          case 0:
-            switch (c = getc(stdin)) {
-               case -1:
-                  printf("%d\n", targets[8] * targets[7]);
-                  exit(0);
+            switch (c) {
                case ' ':
                   targets[1]++;
                   break;
@@ -26,7 +23,7 @@ main()
             }
             break;
          case 1:
-            if ((c = getc(stdin)) > 32) {
+            if (c > 32) {
                targets[0] = targets[0] * 10 + c - 48;
                break;
             }
@@ -34,10 +31,10 @@ main()
             targets[l+1] += (targets[4] - targets[2] ) * targets[0];
             l = 0;
             targets[0] = 0;
-            targets[1]--;
-            break;
-
+            targets[1]++;
       }
    }
+   printf("%d\n", targets[8] * targets[7]);
+   exit(0);
 }
 
