@@ -6,7 +6,7 @@ enum {
    expect_num,
    nextline,
    done
-} s;
+};
 
 int targets[10];
 int c;
@@ -15,20 +15,20 @@ int l;
 int
 main()
 {
-   while (s != done) {
-      switch (s) {
+   while (targets[1] != done) {
+      switch (targets[1]) {
          case nextline:
             l = 0;
-            s = expect_space;
+            targets[1] = expect_space;
             break;
 
          case expect_space:
             switch (c = getc(stdin)) {
                case ' ':
-                  s = expect_num;
+                  targets[1] = expect_num;
                   break;
                case -1:
-                  s = done;
+                  targets[1] = done;
                   break;
                default:
                   ++l;
@@ -46,7 +46,7 @@ main()
                   targets[l] += targets[0];
                   targets[l+1] += (targets[4] - targets[2] ) * targets[0];
                   targets[0] = 0;
-                  s = nextline;
+                  targets[1] = nextline;
                   break;
                default:
                   abort();
