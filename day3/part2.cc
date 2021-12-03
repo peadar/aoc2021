@@ -21,19 +21,12 @@ int main() {
       auto top = values.begin();
       auto bottom = values.end();
       for (Value key = Value(1) << (maxbits-1); bottom[-1] != *top; key /= 2) {
-         auto searchtop = top;
-         auto searchbottom = bottom;
-         while (searchbottom - searchtop > 1) {
-            auto center = searchtop + (searchbottom - searchtop) / 2;
-            if ((*center & key) == 0)
-               searchtop = center;
-            else
-               searchbottom = center;
-         }
-         if (searchbottom - top <= bottom - searchbottom == bool(pass))
-            top = searchbottom;
+         auto partition = std::partition_point(top, bottom,
+                                    [key] (auto a) { return (a & key) == 0; } );
+         if (partition - top <= bottom - partition == bool(pass))
+            top = partition;
          else
-            bottom = searchbottom;
+            bottom = partition;
       }
       out *= *top;
    }
