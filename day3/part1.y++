@@ -1,0 +1,60 @@
+%{
+#include <iostream>
+#include <unistd.h>
+#include <cassert>
+
+int yylex();
+int yyparse();
+int col;
+int maxcol;
+int count[64];
+int lines;
+int yyerror(const char *p) {
+   std::clog << p << ", line: " <<lines+1 <<",col  " << col +1 << std::endl;
+   exit(1);
+}
+
+
+%}
+
+%token BIT EOL
+%union { int value; }
+%type<value> BIT;
+
+%%
+lines:
+     | line lines
+     ;
+
+line: bits EOL { maxcol = col; lines++; col = 0; }
+bits :
+     | bits BIT { count[col++] += $2 ? 1 : -1; }
+     ;
+
+%%
+
+extern "C" { int yywrap() { return true; } }
+
+int yylex() {
+   int c = getc(stdin);
+   switch (c) {
+   case '0': yylval.value = 0; return BIT;
+   case '1': yylval.value = 1; return BIT;
+   case '\n': return EOL;
+   default: return YYEOF;
+   }
+}
+
+int main() {
+   yyparse();
+
+   uint64_t value = 0;
+   for (int i = 0; i < maxcol; ++i) {
+      value <<= 1;
+      assert(count[i] != 0);
+      if (count[i] >= 0)
+         value |= 1;
+   }
+   std::cout << value * (~value & ((1<<maxcol)-1)) << std::endl;
+   return 0;
+}
