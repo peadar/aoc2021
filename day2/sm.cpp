@@ -1,40 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-enum { expect_space, expect_num, nextline, done };
+int i[11];
 
-int targets[9];
-int c;
-int l;
-
-int
-main()
-{
-   while((c=getc(stdin)) != -1) {
-      switch (targets[1] % 2) {
+int main() {
+   while((i[9]=getc(stdin)) != -1) {
+      switch (i[1] % 2) {
          case 0:
-            switch (c) {
+            switch (i[9]) {
                case ' ':
-                  targets[1]++;
+                  i[1]++;
                   break;
                default:
-                  ++l;
+                  ++i[10];
                   break;
             }
             break;
          case 1:
-            if (c > 32) {
-               targets[0] = targets[0] * 10 + c - 48;
+            if (i[9] > 32) {
+               i[0] = i[0] * 10 + i[9] - 48;
                break;
             }
-            targets[l] += targets[0];
-            targets[l+1] += (targets[4] - targets[2] ) * targets[0];
-            l = 0;
-            targets[0] = 0;
-            targets[1]++;
+            i[i[10]] += i[0];
+            i[i[10]+1] += (i[4] - i[2] ) * i[0];
+            i[10] = 0;
+            i[0] = 0;
+            i[1]++;
       }
    }
-   printf("%d\n", targets[8] * targets[7]);
+   printf("%d\n", i[8] * i[7]);
    exit(0);
 }
 
