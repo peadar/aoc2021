@@ -1,11 +1,11 @@
 CXXFLAGS += --std=c++20 -g
 
-all: part1
-
-
-test: part1
-	./part1 < ./.input
-
+all: answer
+test: answer
+	@echo question input
+	./answer < ./.input
+	@echo example input
+	./answer < ./.testinput
 
 clean:
 	rm -f part1 *.o

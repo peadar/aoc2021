@@ -1,4 +1,5 @@
 #include <bitset>
+#include <assert.h>
 #include <unistd.h>
 #include <string_view>
 #include <unordered_map>
@@ -27,7 +28,6 @@ template <typename Q> bool splitNumbers(std::istream &is, Q q) {
    return true;
 }
 
-
 struct Number {
    int row;
    int col;
@@ -37,6 +37,7 @@ struct Board {
    std::unordered_map<int, Number> numbers;
    std::vector<int> rowCounts;
    std::vector<int> colCounts;
+   bool won = false;
    Board(std::istream &);
 };
 
@@ -60,6 +61,7 @@ Board::Board(std::istream &is) {
    for (;; ++row) {
       int col = 0;
       bool rc = splitNumbers(is, [this, row, &col](size_t value) {
+         assert( numbers.find( value ) == numbers.end());
          numbers[value] = {row, col};
          ++col;
       });
@@ -77,11 +79,16 @@ main()
    Game g(std::cin);
 
    std::bitset<100> called;
-   bool won = false;
+   int won = 0;
+   int round = 0;
+
    for (auto caller : g.calledNumbers) {
-      if (won)
+      round++;
+      if (won == g.boards.size())
          break;
       for (auto &board : g.boards) {
+         if (board.won)
+            continue;
          called.set(caller);
          auto it = board.numbers.find(caller);
          if (it == board.numbers.end())
@@ -89,16 +96,19 @@ main()
          auto &num = it->second;
          board.rowCounts[num.row]++;
          board.colCounts[num.col]++;
-         if (board.rowCounts[num.row] == board.colCounts.size() || board.colCounts[num.col] == board.rowCounts.size()){
+         if (board.rowCounts[num.row] == board.colCounts.size() ||
+             board.colCounts[num.col] == board.rowCounts.size()) {
             int total = 0;
             for (auto &num : board.numbers) {
                if (!called.test(num.first))
                   total += num.first;
             }
-            std::cout << "board " << &board - &g.boards[0] << "  has winning row/col.Score is "
-               << total * caller << std::endl;
-            won = true;
-            break;
+            // Print first and last winning boards.
+            if (won == 0 || won == g.boards.size() - 1)
+               std::cout << round << ": board " << &board - &g.boards[0]
+                  << " has winning row/col.Score is " << total * caller << std::endl;
+            board.won = true;
+            won++;
          }
       }
    }
