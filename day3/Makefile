@@ -15,3 +15,4 @@ part2: part2.cc
 test: part1 part2
 	./part1 < .input
 	./part2 < .input
+	python ./part2.py < .input
