@@ -60,53 +60,64 @@ Board::Board(std::istream &is) {
    int row = 0, maxcol = 0;
    for (;; ++row) {
       int col = 0;
-      bool rc = splitNumbers(is, [this, row, &col](size_t value) {
-         assert( numbers.find( value ) == numbers.end());
-         numbers[value] = {row, col};
-         ++col;
-      });
+      bool rc = splitNumbers(is, [this, row, &col](size_t value) { numbers[value] = {row, col++}; });
       maxcol = std::max(col, maxcol);
       if (!rc)
          break;
    }
+   // size up row/col counters for counting hits on each row/col in bingo game.
    rowCounts.resize(row);
    colCounts.resize(maxcol);
 }
 
-int
-main()
-{
+int main() {
    Game g(std::cin);
-
    std::bitset<100> called;
    int won = 0;
    int round = 0;
 
    for (auto caller : g.calledNumbers) {
-      round++;
-      if (won == g.boards.size())
+
+      if (won == g.boards.size()) // stop if all boards have "won"
          break;
+
+      round++;
+      // check each board against the called number, "caller".
       for (auto &board : g.boards) {
          if (board.won)
+            // ignore boards that have already been finished.  we could remove
+            // it from the boards vector, but it's awkward while we are
+            // iterating.
             continue;
+
+         // Accumulate the set of numbers called (needed to work out score later)
          called.set(caller);
+
+         // if the board has this number, increment the row and column counters
+         // for where it appears on this board.
          auto it = board.numbers.find(caller);
          if (it == board.numbers.end())
             continue;
          auto &num = it->second;
          board.rowCounts[num.row]++;
          board.colCounts[num.col]++;
+
+         // If the updated row or column is now full, this is a winning board,
+         // and this board no longer participates.
          if (board.rowCounts[num.row] == board.colCounts.size() ||
              board.colCounts[num.col] == board.rowCounts.size()) {
-            int total = 0;
-            for (auto &num : board.numbers) {
-               if (!called.test(num.first))
-                  total += num.first;
-            }
-            // Print first and last winning boards.
-            if (won == 0 || won == g.boards.size() - 1)
+
+            // For the first and last board that wins, print the score.
+            if (won == 0 || won == g.boards.size() - 1) {
+               int total = 0;
+               for (auto &num : board.numbers) {
+                  if (!called.test(num.first))
+                     total += num.first;
+               }
+               // Print first and last winning boards.
                std::cout << round << ": board " << &board - &g.boards[0]
                   << " has winning row/col.Score is " << total * caller << std::endl;
+            }
             board.won = true;
             won++;
          }
