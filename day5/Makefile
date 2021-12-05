@@ -1,0 +1,8 @@
+CXXFLAGS += -g -O0 --std=c++20
+all: parts
+
+test: all
+	./parts < .input
+
+clean:
+	rm -f parts *.o
