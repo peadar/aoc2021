@@ -1,46 +1,36 @@
 #include<iostream>
-#include<fstream>
-#include<vector>
+#include<map>
 #include<iterator>
 #include<string>
 using namespace std;
 struct P {
    int x, y;
-   static P max;
+   bool operator < (const P &rhs) const noexcept { return x < rhs.x || (x == rhs.x && y < rhs.y); }
 };
-P P::max;
-struct L {
-   P a, b;
-};
+struct L { P a, b; };
 istream &operator >> (istream &is, P &p) {
    char comma;
-   is >> p.x >> comma >> p.y;
-   P::max.x = max(P::max.x, p.x);
-   P::max.y = max(P::max.y, p.x);
-   return is;
+   return is >> p.x >> comma >> p.y;
 }
 istream &operator >> (istream &is, L &l) {
    string arrow;
    return is >> l.a >> arrow >> l.b;
 }
 int main() {
-   vector<L> v;
-   copy(istream_iterator<L>(cin), istream_iterator<L>(), back_inserter(v));
-   for (int part = 1; part <= 2; ++part) {
-      vector<int> pixels((P::max.x + 1) * (P::max.y + 1));
-      int crosses = 0;
-      for (const auto &l : v) {
-         int dx = l.a.x == l.b.x ? 0 : l.a.x < l.b.x ? 1 : -1;
-         int dy = l.a.y == l.b.y ? 0 : l.a.y < l.b.y ? 1 : -1;
-         if (part == 1 && dx != 0 && dy != 0)
-            continue;
-         for (int x = l.a.x, y = l.a.y;; x += dx, y += dy ) {
-            if (++pixels[y * (P::max.x + 1) + x] == 2)
-               crosses++;
-            if (x == l.b.x && y == l.b.y)
-               break;
-         }
+   std::map<P, std::pair<int, int>> pixels;
+   int part1 = 0, part2 = 0;
+   for (auto i = istream_iterator<L>(cin); i != istream_iterator<L>(); ++i) {
+      int dx = i->a.x == i->b.x ? 0 : i->a.x < i->b.x ? 1 : -1;
+      int dy = i->a.y == i->b.y ? 0 : i->a.y < i->b.y ? 1 : -1;
+      for (int x = i->a.x, y = i->a.y;; x += dx, y += dy ) {
+         auto &count = pixels[P{x, y}];
+         if ((dx == 0 || dy == 0) && ++count.first == 2)
+            part1++;
+         if (++count.second == 2)
+            part2++;
+         if (x == i->b.x && y == i->b.y)
+            break;
       }
-      cout << "part " << part << ": " << crosses << "\n";
    }
+   cout << "part1: " << part1 << std::endl << "part2: " << part2 << "\n";
 }
