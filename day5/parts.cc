@@ -23,12 +23,11 @@ istream &operator >> (istream &is, L &l) {
    string arrow;
    return is >> l.a >> arrow >> l.b;
 }
-int main(int argc, char *argv[]) {
+int main() {
    vector<L> v;
    copy(istream_iterator<L>(cin), istream_iterator<L>(), back_inserter(v));
    for (int part = 1; part <= 2; ++part) {
       vector<int> pixels((P::max.x + 1) * (P::max.y + 1));
-      int count = 0;
       int crosses = 0;
       for (const auto &l : v) {
          int dx = l.a.x == l.b.x ? 0 : l.a.x < l.b.x ? 1 : -1;

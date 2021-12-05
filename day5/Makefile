@@ -1,4 +1,4 @@
-CXXFLAGS += -g -O0 --std=c++20
+CXXFLAGS += -g -Wall -O3 -pedantic -Wextra --std=c++20
 all: parts
 
 test: all
