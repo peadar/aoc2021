@@ -8,4 +8,4 @@ test: answer
 	./answer < ./.testinput
 
 clean:
-	rm -f part1 *.o
+	rm -f answer *.o
