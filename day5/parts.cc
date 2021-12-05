@@ -28,12 +28,13 @@ int main(int argc, char *argv[]) {
       ymax = max(ymax, max(i->b.y, i->a.y));
    }
    if (argc == 2 && std::string(argv[1]) == "ppm") {
-      cout << "P3 " << xmax << " " << ymax << " "<< imax << std::endl;
-      for (auto y = 0; y < ymax; ++y) {
-         for (auto x = 0; x < xmax; ++x) {
-            int intensity = pixels[y * 1000 + x].second;
-            for (int i = 0; i < 3; ++i)
-               cout << intensity << " ";
+      cout << "P3 " << xmax+1 << " " << ymax+1 << " "<< 255 << std::endl;
+      const char *colors[] { "0 0 0 ", "0 0 127 ", "0 0 255 ", "0 127 255 ", "0 255 255 ", "255 255 255 ", };
+
+      for (auto y = 0; y <= ymax; ++y) {
+         for (auto x = 0; x <= xmax; ++x) {
+            int intensity = min(size_t(pixels[y * 1000 + x].second), sizeof(colors)/sizeof(colors[0]) - 1);
+            cout << colors[intensity];
          }
          cout << endl;
       }
