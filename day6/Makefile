@@ -1,3 +1,4 @@
+CXXFLAGS += -g -O3
 parts: parts.o
 	$(CXX) -o $@ $^
 
