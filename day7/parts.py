@@ -5,9 +5,8 @@ def part1cost(target, positions):
     return sum(abs(target - p) for p in positions)
 centreval = positions[len(positions)//2]
 print("part1: %d" % part1cost(centreval, positions))
-avg = sum(p for p in positions) // len(positions)
 def part2cost(target, positions):
     def onecost(val):
-        return int((val + 1) * (val/2))
+        return int((val * (val + 1)) // 2)
     return sum(onecost(abs(target - p)) for p in positions)
-print("part2: %d" % part2cost(avg, positions))
+print("part2: %d" % part2cost( sum(p for p in positions) // len(positions) , positions))
