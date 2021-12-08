@@ -7,7 +7,7 @@ lexer.cc: lexer.l parser.h
 parser.cc parser.h: parser.y
 	bison -o parser.cc --defines=parser.h $^
 clean:
-	rm -rf *.cc *.o sol *.h
+	rm -rf *.cc *.o sol *.h sm
 test: sol sm
 	./sol < .input
 	./sm < .input
