@@ -1,6 +1,6 @@
 CXXFLAGS += --std=c++20 -g
 
-all: answer
+all: test
 test: answer
 	@echo question input
 	./answer < ./.input

@@ -1,6 +1,6 @@
 CXXFLAGS =-O3 -g --std=c++20 -fno-omit-frame-pointer -Wall -Werror -pedantic -Wextra
 
-all: parts
+all: test
 
 parts: parts.o
 	$(CXX) -o $@ $^
@@ -8,4 +8,4 @@ parts: parts.o
 test: parts
 	./parts < .input
 clean:
-	rm *.o parts perf.data*
+	rm -f *.o parts perf.data*

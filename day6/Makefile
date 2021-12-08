@@ -1,4 +1,7 @@
 CXXFLAGS += -g -O3 -fno-omit-frame-pointer -Wall -Wextra -pedantic
+
+all: test
+
 parts: parts.o
 	$(CXX) -o $@ $^
 
@@ -9,4 +12,4 @@ test: parts
 	@python ./parts.py < .input
 
 clean:
-	rm -f parts *.o
+	rm -f parts *.o perf.data*

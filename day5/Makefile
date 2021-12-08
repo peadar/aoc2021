@@ -1,10 +1,10 @@
 CXXFLAGS += -g -Wall -O3 -pedantic -Wextra --std=c++20
-all: parts
+all: test
 
-test: all
+test: parts
 	./parts < .input
 
-visual: all
+visual: parts
 	./parts ppm < .input | convert - day5.png
 
 clean:
