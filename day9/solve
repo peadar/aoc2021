@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+class Basins():
+    def __init__(self, filename):
+        self.grid = [ [int(i) for i in l.strip()] for l in open(filename) ]
+    def peek(self, point):
+        row, col = point
+        return self.grid[row][col] if row >= 0 and row < len(self.grid) and col >= 0 and col < len(self.grid[0]) else 100
+    @staticmethod
+    def adjacent(point):
+        row,col=point
+        return [ (row-1, col), (row+1, col), (row, col-1), (row, col+1) ]
+    def basinSize(self, point, visited):
+        if self.peek(point) >= 9 or point in visited:
+            return 0
+        visited.add(point)
+        return 1 + sum(self.basinSize(adj, visited) for adj in Basins.adjacent(point) if self.peek(adj) >= self.peek(point) )
+    def findBasins(self):
+        basins = []
+        risk = 0
+        for row in range(len(self.grid)):
+            for col in range(len(self.grid[0])):
+                here = (row,col)
+                if all(self.peek(here) < adj for adj in [self.peek(point) for point in Basins.adjacent(here)]):
+                    risk += self.peek(here) + 1
+                    basins.append(self.basinSize(here, set()))
+        basins.sort()
+        return risk, basins[-3:]
+    def ppm(self):
+        print("P3 %d %d 9" % ( len(self.grid[0]), len(self.grid)))
+        for l in self.grid:
+            for i in l:
+                print("%d %d %d " % (0, i/2, i), end="")
+            print("")
+
+solver = Basins(".input")
+risk, basins = solver.findBasins()
+# solver.ppm()
+print("part1: %d" % risk)
+print("part2: %d" % (basins[0] * basins[1] * basins[2]))
