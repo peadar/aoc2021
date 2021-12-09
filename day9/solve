@@ -32,7 +32,7 @@ class Basins():
         print("P3 %d %d 81" % ( len(self.grid[0]), len(self.grid)))
         for row,l in enumerate(self.grid):
             for col,i in enumerate(l):
-                print("%d %d %d " % (0, i*i if (row,col) in bright else 0, i*i), end="")
+                print("%d %d %d " % (i*i if (row,col) in bright else 0, 0, i*i), end="")
             print("")
 
 solver = Basins(".input")
