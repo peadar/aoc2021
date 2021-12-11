@@ -1,55 +1,44 @@
 #include <stack>
+#include <map>
 #include <tuple>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <string_view>
-
 using namespace std;
 
 namespace {
-enum BracketType { OPEN, CLOSE, ERROR };
-tuple<BracketType, char, unsigned> bracketClass(char c) {
-   switch (c) {
-      case '(': return { OPEN, ')', 3 };
-      case ')': return { CLOSE, '(', 3 };
-      case '[': return { OPEN, ']', 57 };
-      case ']': return { CLOSE, '[', 57 };
-      case '{': return { OPEN, '}', 1197 };
-      case '}': return { CLOSE, '{', 1197 };
-      case '<': return { OPEN, '>', 25137 };
-      case '>': return { CLOSE, '<', 25137 };
-      default:  return { ERROR, 0, -1 };
-   }
-}
+map<char, int> scores { { ')', 3 }, { ']', 57 }, { '}', 1197 }, { '>', 25137 },
+   { '(', 1 }, { '[', 2 }, { '{', 3 }, { '<', 4 } };
+map<char, char> openFor { { ')', '(' }, { ']','[' }, { '}','{' }, { '>', '<' } };
 
 unsigned long
 processChunk(string_view s, stack<char> &brackets) {
-   int total;
    for (auto c : s) {
-      auto [ type, match, score ] = bracketClass(c);
-      switch (type) {
-         case OPEN:
-            brackets.push(c);
-            break;
-         case CLOSE:
-            if (brackets.empty())
-               throw 999;
-            if (brackets.top() != match)
-               return score;
-            brackets.pop();
-            break;
-         default:
-            abort();
+      auto o = openFor.find(c);
+      if (o == openFor.end()) {
+         brackets.push(c);
+      } else {
+         if (brackets.empty())
+            throw 999;
+         if (brackets.top() != o->second)
+            return scores[c];
+         brackets.pop();
       }
    }
    return 0;
 }
+unsigned long
+scoreUnmatched(stack<char> &brackets) {
+   unsigned long score = 0;
+   for (; !brackets.empty(); brackets.pop())
+      score = score * 5 + scores[brackets.top()];
+   return score;
 }
-
+}
 int main() {
    unsigned long part1 = 0;
-   std::vector<long> scores;
+   vector<unsigned long> scores;
    for (;;) {
       string l;
       getline(cin, l);
@@ -57,25 +46,12 @@ int main() {
          break;
       stack<char> brackets;
       unsigned long rc = processChunk(l, brackets);
-      if (rc) {
+      if (rc)
          part1 += rc;
-      } else {
-         unsigned long score = 0;
-         while (!brackets.empty()) {
-            score *= 5;
-            switch (brackets.top()) {
-               case '(': score += 1; break;
-               case '[': score += 2; break;
-               case '{': score += 3; break;
-               case '<': score += 4; break;
-               default: abort();
-            }
-            brackets.pop();
-         }
-         scores.push_back(score);
-      }
+      else
+         scores.push_back(scoreUnmatched(brackets));
    }
    sort(scores.begin(), scores.end());
-   std::cout << "part1: " << part1 << std::endl;
-   std::cout << "part2: " << scores[scores.size()/2] << std::endl;
+   cout << "part1: " << part1 << endl;
+   cout << "part2: " << scores[scores.size()/2] << endl;
 }

@@ -1,4 +1,4 @@
-CXXFLAGS += -g -O0 --std=c++20
+CXXFLAGS += -g -Os --std=c++20 -Wall -Wextra
 
 all: test
 
