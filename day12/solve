@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+import sys
+links = frozenset(( tuple(link.strip().split("-")) for link in  open(sys.argv[1] if len(sys.argv) > 1 else ".input") ))
+links = frozenset.union(links, ((to,fro) for (fro, to) in links)) # Add reverse links, too.
+
+# Don't walk all the links to just filter by start - create an index on the start
+linksByStart = {}
+for start,end in links:
+    linksByStart[start] = linksByStart.get(start, []) + [end]
+
+def solve(start, end, links, visited, revisited):
+    if start == end:
+        yield [end]
+        return
+    if start in visited:
+        return
+    def generate(revisited):
+        for nextlink in linksByStart[start]:
+            for p in solve(nextlink, end, links, visited, revisited):
+                yield([start] + p)
+    if start.islower():
+        if revisited is None and start != "start":
+            yield from generate(start)
+        visited = frozenset.union(visited, [start])
+    yield from generate(revisited)
+
+for (part, revisited) in [ (1, "_"), (2, None) ]:
+    # We can go back on ourselves for part2, and generate non-unique paths.
+    # We could memoize, but be lazy, and dedup at the end.
+    ps = set(tuple(p) for p in solve("start", "end", links, frozenset([]), revisited))
+    print("part %d: %d" % (part, len(ps)))
