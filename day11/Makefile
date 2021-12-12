@@ -1,8 +1,9 @@
 CXXFLAGS += -g -O3 -std=c++20 -Wall
-all: test
 
-test: solve
+test: all
 	./solve < .input
+
+all: solve
 
 clean:
 	rm -f *.o solve

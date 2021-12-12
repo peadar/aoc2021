@@ -1,0 +1,5 @@
+test:
+	./solve
+
+all:
+clean:

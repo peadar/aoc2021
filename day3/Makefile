@@ -1,7 +1,11 @@
 YACC=bison
 
 CXXFLAGS = -g -O0 --std=c++20
-all: test
+
+test: all
+	./part1 < .input
+	./part2 < .input
+	python ./part2.py < .input
 
 %.cc: %.y++
 	bison -o $@ $^
@@ -12,7 +16,4 @@ clean:
 part1: part1.cc
 part2: part2.cc
 
-test: part1 part2
-	./part1 < .input
-	./part2 < .input
-	python ./part2.py < .input
+all: part1 part2
