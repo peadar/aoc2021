@@ -1,0 +1,16 @@
+#!/bin/env python3
+import sys, functools
+coords, xforms = [], []
+with open(".input" if len(sys.argv) < 2 else sys.argv[1]) as f:
+    for l in (l.strip() for l in f if l != "\n"):
+        if l.startswith("fold along "):
+            def xform(axis, about):
+                return lambda p: ( about*2-p[0] if p[0] > about and axis == "x" else p[0], about*2-p[1] if p[1] > about and axis == "y" else p[1])
+            text = l[11:].split("=")
+            xforms.append(xform(text[0], int(text[1])))
+        else:
+            coords.append(tuple(int(i) for i in l.split(",")))
+print("part1: %d" % len(set([ xforms[0](p) for p in coords])))
+l = set(functools.reduce(lambda point, mapping: mapping(point), xforms, p) for p in coords)
+maxX, maxY = max(x for (x,_) in l), max(y for (_,y) in l)
+print("part2:\n%s" % "\n".join("".join(("█" if (x,y) in l else " ") for x in range(maxX+1)) for y in range(maxY+1)))
