@@ -4,68 +4,61 @@
 #include <string>
 #include <limits>
 #include <cstdlib>
-#include <unistd.h>
+
 using namespace std;
+using TwoChars = pair<char, char>; // Adjacent pair of characters.
+using Rules = map<TwoChars, char>; // Rules: XY->Z
+using Counts = map<TwoChars, unsigned long>; // Counts of specific pairs.
 
 int
 main(int argc, char *argv[])
 {
-   string polymer, ignore;
+   int iterations = argc >= 2 ? strtoul(argv[1], 0, 0) : 10;
+
+   string polymer, s;
    getline(cin, polymer);
-   getline(cin, ignore);
-   int iterations = 10;
+   getline(cin, s);
 
-   int c;
-   while ((c = getopt(argc, argv, "i:")) != -1) {
-      switch (c) {
-         case 'i':
-            iterations = strtoul(optarg, 0, 0);
-            break;
-      }
-   }
-
-   map<pair<char, char>, char> rules;
+   Rules rules;
    for (;;) {
-      string ruleText;
-      getline(cin, ruleText);
-      if (ruleText == "")
+      getline(cin, s);
+      if (s == "")
         break;
-      rules[std::make_pair(ruleText[0], ruleText[1])] = ruleText[6];
+      rules[{s[0], s[1]}] = s[6];
    }
 
-   for (int i = 0; i < iterations; ++i) {
-      std::string newPoly;
-      char c1 = polymer[0];
-      newPoly.push_back(c1);
-      for (size_t i = 1; i < polymer.size(); ++i) {
-         char c2 = polymer[i];
-         char extra = rules[{c1, c2}];
-         newPoly.push_back(extra);
-         newPoly.push_back(c2);
-         c1 = c2;
-      }
-      polymer = std::move(newPoly);
-      newPoly = "";
-      std::cout << "iter " << i << ": " << polymer << std::endl;
-   }
-   vector<long> counts('Z' + 1 - 'A');
+   Counts counts; // count the pairs in the initial polymer string.
+   for (size_t i = 0; i < polymer.size() - 1; ++i)
+      counts[{polymer[i], polymer[i+1]}]++;
 
-   for (size_t i = 0; i < polymer.size(); ++i)
-      counts[polymer[i] - 'A']++;
-
-   char smallChar = '_', bigChar = '_';
-   long smallCount=numeric_limits<long>::max(), bigCount = -1;
-   for (int i = 0; i < 26; ++i) {
-      if (counts[i] == 0)
-         continue;
-      if (counts[i] > bigCount) {
-         bigCount = counts[i];
-         bigChar = i + 'A';
+   // Each replacement destroys all pairs of one type, and creates two new
+   // distinct pairs from each.  Count the numbers of each pair.
+   for (auto i = 0; i < iterations; ++i) {
+      Counts newCounts;
+      for (auto &old : counts) {
+         char neu = rules.at(old.first);
+         newCounts[ { old.first.first, neu } ] += old.second;
+         newCounts[ { neu, old.first.second } ] += old.second;
       }
-      if (counts[i] < smallCount) {
-         smallCount = counts[i];
-         smallChar = i + 'A';
-      }
+      counts = std::move(newCounts);
    }
-   std::cout << bigCount - smallCount << std::endl;
+
+   // we know how many of each pair we have. Count the individual characters...
+   std::map<char, unsigned long> charCounts;
+   for (auto &old : counts) {
+      charCounts[old.first.first]+=old.second;
+      charCounts[old.first.second]+=old.second;
+   }
+
+   // ... but each actual character appears in *2* pairs, so divide by two ...
+   // ... except the first and last chars appear in only *one* pair. All
+   // characters will have an even count except potentially for the first and
+   // last, which will have an odd count, so we round the odd numbers up.
+   unsigned long low = std::numeric_limits<unsigned long>::max(), high=0;
+   for (auto &c : charCounts) {
+      auto v = c.second = (c.second + 1) / 2;
+      low = min(low, v);
+      high = max(high, v);
+   }
+   std::cout << high - low << std::endl;
 }
