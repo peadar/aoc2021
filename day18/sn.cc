@@ -1,4 +1,5 @@
 #include "sn.h"
+#include <cassert>
 using namespace std;
 
 struct SnailNum::ExplodeState {

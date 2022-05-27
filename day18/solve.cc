@@ -1,4 +1,6 @@
 #include "sn.h"
+#include <vector>
+#include <iterator>
 using namespace std;
 
 int main(int argc, char *argv[]) {

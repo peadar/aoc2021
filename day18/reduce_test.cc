@@ -1,5 +1,6 @@
 #include "sn.h"
 #include <sstream>
+#include <cassert>
 
 template <typename T> std::string stringify(const T &streamable) {
    std::ostringstream os;
